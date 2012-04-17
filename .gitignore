@@ -1,0 +1,10 @@
+syntax:glob
+
+dist
+build
+doc/*.html
+*.pyc
+*.swp
+.#*
+*~
+.coverage
