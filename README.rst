@@ -33,9 +33,12 @@ Configuration
 -------------
 
   1. Edit the nxpgmon and set the default:
-     - PG_LOG: the PostgreSQL log file path
-     - DB_NAME: the database name
-     - SUMMARY: the aspersa summary script
+
+     - ``PG_LOG``: the PostgreSQL log file path
+
+     - ``DB_NAME``: the database name
+
+     - ``SUMMARY``: the aspersa summary script
 
   2. Modify the postgresql.conf file ::
 
@@ -79,5 +82,4 @@ Usage
 Todo
 -----
 
-- prefix with the host name (nxpgmon start [tag] or nxpgmon stop [tag])
-  -> output nxpgmon-TAG-HOST-DATE.tgz
+- prefix archive file with host name and tag: nxpgmon-TAG-HOST-DATE.tgz
