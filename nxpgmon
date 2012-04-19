@@ -1,10 +1,13 @@
 #!/bin/bash
 ###
 # Nuxeo PostgreSQL monitoring script
-LOG_DIR=${LOG_DIR:-/tmp/pgmon-log}
+
 DB_NAME=${DB_NAME:-nuxeo}
 PG_LOG=${PG_LOG:-/var/log/postgresql/postgresql-9.1-main.log}
+SUMMARY=${SUMMARY:-`which summary`}
+LOG_DIR=${LOG_DIR:-/tmp/pgmon-log}
 
+### END OF CONF
 
 die() {
   echo "ERROR: $*"
@@ -80,6 +83,11 @@ ATOP_INTERVAL=5
 ATOP_COUNT=1440
 
 ###
+# summary
+
+
+
+###
 # PostgreSQL and logtail
 LOGTAIL=`which logtail`
 if [ -z $LOGTAIL ]; then
@@ -129,6 +137,11 @@ log_misc() {
     df -h >> $file
 }
 
+log_summary() {
+    file=$1
+    [ -z $SUMMARY ] && return 0
+    $SUMMARY > $file
+}
 
 log_pgstat_reset() {
     psql $DB_NAME <<EOF &> /dev/null
@@ -230,6 +243,7 @@ start() {
     $SAR -d -o $SAR_DATA $SAR_INTERVAL $SAR_COUNT >/dev/null 2>&1 &
     echo $! > $SAR_PID
 
+    [ -r "$ATOP_DATA" ] && rm -f $ATOP_DATA
     atop -w $ATOP_DATA $ATOP_INTERVAL $ATOP_COUNT >/dev/null 2>&1 &
     echo $! > $ATOP_PID
 
@@ -244,6 +258,10 @@ start() {
     rm -f $LOG_DIR/misc-*.txt
     log_misc $LOG_DIR/misc-start.txt
     
+    # summary
+    rm -f $LOG_DIR/summary.txt
+    log_summary $LOG_DIR/summary.txt
+
     # pg stats
     rm -f $LOG_DIR/pgstat-*.txt
     log_pgstat $LOG_DIR/pgstat-start.txt
