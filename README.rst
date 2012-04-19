@@ -40,26 +40,35 @@ Configuration
 
      - ``SUMMARY``: the aspersa summary script
 
-  2. Modify the postgresql.conf file ::
+  2. Modify the postgresql.conf file to add logs, theses option can
+     stay in production ::
 
-       -- pg_stat_statement
-       fileshared_preload_libraries = 'pg_stat_statements'
+       # pg_stat_statement
+       shared_preload_libraries = 'pg_stat_statements'
        custom_variable_classes = 'pg_stat_statements'
        pg_stat_statements.max = 10000
        pg_stat_statements.track = top
-       -- pgfouine compatible log
+       # pgfouine compatible log
        log_min_duration_statement = 200
        log_line_prefix = '%t [%p]: [%l-1] user=%u,db=%d '
-       -- important logs
+       # important logs
        log_checkpoints=on
        log_lock_waits=on
        log_temp_files=0
        log_autovacuum_min_duration=0
 
+  3. Optional configuration, NOT FOR PRODUCTION ::
 
-  3. Restart the database
+       # auto explain
+       shared_preload_libraries = 'pg_stat_statements, auto_explain'
+       custom_variable_classes = 'pg_stat_statements, auto_explain'
+       auto_explain.log_min_duration = '1s'
+       auto_explain.log_analyze = 'true'
 
-  4. Enable extension in your database as ``postgres`` user::
+
+  4. Restart the database
+
+  5. Enable extension in your database as ``postgres`` user::
 
        psql $DB_NAME -c "CREATE EXTENSION pg_stat_statements; CREATE EXTENSION pg_buffercache;"
 
