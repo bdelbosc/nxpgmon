@@ -15,9 +15,13 @@ Requirement
 ------------
 
   This scripts requires the following packages:
+
   - atop
+
   - sysstat
+
   - logtail
+
   - postgresql-contrib (for pg_stat_statements and pg_buffers)
   
   Also aspersa summary can be installed::
