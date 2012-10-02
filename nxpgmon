@@ -202,6 +202,26 @@ ORDER BY pg_relation_size(indexrelid) DESC LIMIT 15;
 SELECT relname, idx_tup_fetch + seq_tup_read AS total_reads
 FROM pg_stat_all_tables WHERE idx_tup_fetch + seq_tup_read != 0
 ORDER BY total_reads desc LIMIT 15;
+SELECT
+  sum(heap_blks_read) as heap_read,
+  sum(heap_blks_hit)  as heap_hit,
+  (sum(heap_blks_hit) - sum(heap_blks_read)) / sum(heap_blks_hit) as ratio
+FROM
+  pg_statio_user_tables;
+SELECT
+  relname,
+  100 * idx_scan / (seq_scan + idx_scan) percent_of_times_index_used,
+  n_live_tup rows_in_table
+FROM
+  pg_stat_user_tables
+ORDER BY
+  n_live_tup DESC LIMIT 50;
+SELECT
+  sum(idx_blks_read) as idx_read,
+  sum(idx_blks_hit)  as idx_hit,
+  (sum(idx_blks_hit) - sum(idx_blks_read)) / sum(idx_blks_hit) as ratio
+FROM
+  pg_statio_user_indexes;
 \di+
 SELECT sum(generate_series) AS "speedTest" FROM generate_series(1,1000000);
 EXPLAIN ANALYZE SELECT sum(generate_series) AS "speedTest" FROM generate_series(1,1000000);
@@ -224,7 +244,7 @@ ON (b.reldatabase = d.oid AND d.datname = current_database())
 WHERE pg_relation_size(c.oid) != 0
 GROUP BY c.oid,c.relname
 ORDER BY 3 DESC
-LIMIT 10;
+LIMIT 20;
 SELECT name, unit, current_setting(name), source FROM pg_settings WHERE source!='default';
 SHOW ALL;
 \q
